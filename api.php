@@ -1,20 +1,17 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+// connect to pdo mysql
 include __DIR__ . '/DatabaseConnection.php';
+include __DIR__ . '/DatabaseFunctions.php';
+
+$method = $_SERVER['REQUEST_METHOD'];
+$request = explode('/', trim($_SERVER['PATH_INFO'], '/'));
+header("Access-Control-Allow-Origin: *");
 
 $table = 'flower';
-// retrieve the table and key form the path
-$sql = "select * from `$table`";
-$result = mysqli_query($link,$sql);
+$sort = 'flowerid';
+$result = getAllOrderBy($pdo, $table, $sort);
 if(!$result) {
   http_response_code(404);
-  die(mysqli_error());
+  die('Database error');
 }
-if (!$key) echo '[';
-for ($i=0; $i<mysqli_num_rows($result);$i++){
-  echo ($i>0?',':'').json_encode(mysqli_fetch_object($result));
-}
-if (!$key) echo ']';
-
-// close mysql connection
-mysqli_close($link);
+echo json_encode($result);
